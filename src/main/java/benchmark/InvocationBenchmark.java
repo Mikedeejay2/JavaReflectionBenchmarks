@@ -13,7 +13,7 @@ public class InvocationBenchmark {
 
     private String s1 = "foo", s2 = "bar", s3 = "qux", s4 = "baz";
 
-    private String method(String a, String b, String c, String d) {
+    public String method(String a, String b, String c, String d) {
         return a + b + c + d;
     }
 
@@ -43,7 +43,9 @@ public class InvocationBenchmark {
 
     private CustomFunction<String, InvocationBenchmark>
         lambda,
-        lambdaUnreflected,
+        lambdaUnreflected;
+
+    private CustomFunction<String, Access>
         lambdaUnreflectedPrivate;
 
     private static final MethodHandle
@@ -86,6 +88,24 @@ public class InvocationBenchmark {
             methodHandle,
             MethodType.methodType(String.class, InvocationBenchmark.class, String.class, String.class, String.class, String.class));
         lambda = (CustomFunction<String, InvocationBenchmark>) lambdaSite.getTarget().invokeExact();
+
+        CallSite lambdaUnreflectedSite = LambdaMetafactory.metafactory(
+            MethodHandles.lookup(),
+            "run",
+            MethodType.methodType(CustomFunction.class),
+            MethodType.methodType(Object.class, Object.class, Object.class, Object.class, Object.class, Object.class),
+            methodHandleUnreflected,
+            MethodType.methodType(String.class, InvocationBenchmark.class, String.class, String.class, String.class, String.class));
+        lambdaUnreflected = (CustomFunction<String, InvocationBenchmark>) lambdaUnreflectedSite.getTarget().invokeExact();
+
+        CallSite lambdaUnreflectedPrivateSite = LambdaMetafactory.metafactory(
+            MethodHandles.lookup(),
+            "run",
+            MethodType.methodType(CustomFunction.class),
+            MethodType.methodType(Object.class, Object.class, Object.class, Object.class, Object.class, Object.class),
+            methodHandleUnreflected,
+            MethodType.methodType(String.class, Access.class, String.class, String.class, String.class, String.class));
+        lambdaUnreflectedPrivate = (CustomFunction<String, Access>) lambdaUnreflectedPrivateSite.getTarget().invokeExact();
     }
 
     @Benchmark
@@ -130,7 +150,7 @@ public class InvocationBenchmark {
 
     @Benchmark
     public Object lambdaUnreflected() throws Throwable {
-        return (String) methodHandleUnreflected.invoke(this, s1, s2, s3, s4);
+        return lambdaUnreflected.run(this, s1, s2, s3, s4);
     }
 
     @Benchmark
@@ -144,8 +164,18 @@ public class InvocationBenchmark {
     }
 
     @Benchmark
+    public Object handleUnreflectedPrivate() throws Throwable {
+        return (String) methodHandleUnreflectedPrivate.invoke(Access.INSTANCE, s1, s2, s3, s4);
+    }
+
+    @Benchmark
     public Object handleUnreflectedExactPrivate() throws Throwable {
         return (String) methodHandleUnreflectedPrivate.invokeExact(Access.INSTANCE, s1, s2, s3, s4);
+    }
+
+    @Benchmark
+    public Object lambdaUnreflectedPrivate() throws Throwable {
+        return lambdaUnreflectedPrivate.run(Access.INSTANCE, s1, s2, s3, s4);
     }
 
     @Benchmark

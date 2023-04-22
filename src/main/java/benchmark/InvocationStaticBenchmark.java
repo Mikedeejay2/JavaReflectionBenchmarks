@@ -2,9 +2,7 @@ package benchmark;
 
 import org.openjdk.jmh.annotations.*;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.invoke.*;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +13,7 @@ public class InvocationStaticBenchmark {
 
     private String s1 = "foo", s2 = "bar", s3 = "qux", s4 = "baz";
 
-    private static String method(String a, String b, String c, String d) {
+    public static String method(String a, String b, String c, String d) {
         return a + b + c + d;
     }
 
@@ -28,6 +26,11 @@ public class InvocationStaticBenchmark {
         }
     }
 
+    @FunctionalInterface
+    interface CustomFunction<T> {
+        T run(T a, T b, T c, T d);
+    }
+
     private Method
         method,
         methodAccessible,
@@ -37,6 +40,11 @@ public class InvocationStaticBenchmark {
         methodHandle,
         methodHandleUnreflected,
         methodHandleUnreflectedPrivate;
+
+    private CustomFunction<String>
+        lambda,
+        lambdaUnreflected,
+        lambdaUnreflectedPrivate;
 
     private static final MethodHandle
         METHOD_HANDLE_INLINE,
@@ -59,7 +67,7 @@ public class InvocationStaticBenchmark {
     }
 
     @Setup
-    public void setUp() throws Exception {
+    public void setUp() throws Throwable {
         method = InvocationStaticBenchmark.class.getDeclaredMethod("method", String.class, String.class, String.class, String.class);
         methodAccessible = InvocationStaticBenchmark.class.getDeclaredMethod("method", String.class, String.class, String.class, String.class);
         methodAccessible.setAccessible(true);
@@ -69,6 +77,33 @@ public class InvocationStaticBenchmark {
         methodAccessiblePrivate = Access.class.getDeclaredMethod("method", String.class, String.class, String.class, String.class);
         methodAccessiblePrivate.setAccessible(true);
         methodHandleUnreflectedPrivate = MethodHandles.lookup().unreflect(methodAccessiblePrivate);
+
+        CallSite lambdaSite = LambdaMetafactory.metafactory(
+            MethodHandles.lookup(),
+            "run",
+            MethodType.methodType(CustomFunction.class),
+            MethodType.methodType(Object.class, Object.class, Object.class, Object.class, Object.class),
+            methodHandle,
+            MethodType.methodType(String.class, String.class, String.class, String.class, String.class));
+        lambda = (CustomFunction<String>) lambdaSite.getTarget().invokeExact();
+
+        CallSite lambdaUnreflectedSite = LambdaMetafactory.metafactory(
+            MethodHandles.lookup(),
+            "run",
+            MethodType.methodType(CustomFunction.class),
+            MethodType.methodType(Object.class, Object.class, Object.class, Object.class, Object.class),
+            methodHandleUnreflected,
+            MethodType.methodType(String.class, String.class, String.class, String.class, String.class));
+        lambdaUnreflected = (CustomFunction<String>) lambdaUnreflectedSite.getTarget().invokeExact();
+
+        CallSite lambdaUnreflectedPrivateSite = LambdaMetafactory.metafactory(
+            MethodHandles.lookup(),
+            "run",
+            MethodType.methodType(CustomFunction.class),
+            MethodType.methodType(Object.class, Object.class, Object.class, Object.class, Object.class),
+            methodHandleUnreflected,
+            MethodType.methodType(String.class, String.class, String.class, String.class, String.class));
+        lambdaUnreflectedPrivate = (CustomFunction<String>) lambdaUnreflectedPrivateSite.getTarget().invokeExact();
     }
 
     @Benchmark
@@ -107,6 +142,16 @@ public class InvocationStaticBenchmark {
     }
 
     @Benchmark
+    public Object lambda() throws Throwable {
+        return lambda.run(s1, s2, s3, s4);
+    }
+
+    @Benchmark
+    public Object lambdaUnreflected() throws Throwable {
+        return lambdaUnreflected.run(s1, s2, s3, s4);
+    }
+
+    @Benchmark
     public Object privateNormal() throws Exception {
         return Access.method(s1, s2, s3, s4); // accessor method indirection
     }
@@ -119,6 +164,11 @@ public class InvocationStaticBenchmark {
     @Benchmark
     public Object handleUnreflectedExactPrivate() throws Throwable {
         return (String) methodHandleUnreflectedPrivate.invokeExact(s1, s2, s3, s4);
+    }
+
+    @Benchmark
+    public Object lambdaUnreflectedPrivate() throws Throwable {
+        return lambdaUnreflectedPrivate.run(s1, s2, s3, s4);
     }
 
     @Benchmark

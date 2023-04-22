@@ -14,9 +14,9 @@ public class Main {
 //        run(FieldPrimitiveBenchmark.class);
 //        run(FieldPrimitiveStaticBenchmark.class);
         run(InvocationBenchmark.class);
-//        run(InvocationStaticBenchmark.class);
-//        run(InvocationPrimitiveBenchmark.class);
-//        run(InvocationPrimitiveStaticBenchmark.class);
+        run(InvocationStaticBenchmark.class);
+        run(InvocationPrimitiveBenchmark.class);
+        run(InvocationPrimitiveStaticBenchmark.class);
 //        run(LookupBenchmark.class);
     }
 
