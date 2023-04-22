@@ -15,8 +15,6 @@ public class FieldBenchmark {
 
     private String value = "foo";
 
-    private int primitiveValue = 42;
-
     enum Access {
 
         INSTANCE;
@@ -27,22 +25,16 @@ public class FieldBenchmark {
     private Field
         reflective,
         reflectiveAccessible,
-        reflectivePrimitive,
-        reflectiveAccessiblePrimitive,
         reflectiveAccessiblePrivate;
 
     private MethodHandle
         methodHandle,
         methodHandleUnreflected,
-        methodHandlePrimitive,
-        methodHandleUnreflectedPrimitive,
         methodHandleUnreflectedPrivate;
 
     private static final MethodHandle
         METHOD_HANDLE_INLINE,
         METHOD_HANDLE_UNREFLECTED_INLINE,
-        METHOD_HANDLE_PRIMITIVE_INLINE,
-        METHOD_HANDLE_UNREFLECTED_PRIMITIVE,
         METHOD_HANDLE_UNREFLECTED_PRIVATE;
 
     static {
@@ -50,8 +42,6 @@ public class FieldBenchmark {
 
             METHOD_HANDLE_INLINE = MethodHandles.lookup().findGetter(FieldBenchmark.class, "value", String.class);
             METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflectGetter(FieldBenchmark.class.getDeclaredField("value"));
-            METHOD_HANDLE_PRIMITIVE_INLINE = MethodHandles.lookup().findGetter(FieldBenchmark.class, "primitiveValue", int.class);
-            METHOD_HANDLE_UNREFLECTED_PRIMITIVE = MethodHandles.lookup().unreflectGetter(FieldBenchmark.class.getDeclaredField("primitiveValue"));
             Field reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
             reflectiveAccessiblePrivate.setAccessible(true);
             METHOD_HANDLE_UNREFLECTED_PRIVATE = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
@@ -65,13 +55,8 @@ public class FieldBenchmark {
         reflective = FieldBenchmark.class.getDeclaredField("value");
         reflectiveAccessible = FieldBenchmark.class.getDeclaredField("value");
         reflectiveAccessible.setAccessible(true);
-        reflectivePrimitive = FieldBenchmark.class.getDeclaredField("primitiveValue");
-        reflectiveAccessiblePrimitive = FieldBenchmark.class.getDeclaredField("primitiveValue");
-        reflectiveAccessiblePrimitive.setAccessible(true);
         methodHandle = MethodHandles.lookup().findGetter(FieldBenchmark.class, "value", String.class);
         methodHandleUnreflected = MethodHandles.lookup().unreflectGetter(reflective);
-        methodHandlePrimitive = MethodHandles.lookup().findGetter(FieldBenchmark.class, "primitiveValue", int.class);
-        methodHandleUnreflectedPrimitive = MethodHandles.lookup().unreflectGetter(reflectivePrimitive);
         reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
         reflectiveAccessiblePrivate.setAccessible(true);
         methodHandleUnreflectedPrivate = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
@@ -113,51 +98,6 @@ public class FieldBenchmark {
     }
 
     @Benchmark
-    public int primitive() {
-        return primitiveValue;
-    }
-
-    @Benchmark
-    public int reflectionPrimitive() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflectivePrimitive.get(this);
-    }
-
-    @Benchmark
-    public int reflectionAccessiblePrimitive() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflectiveAccessiblePrimitive.get(this);
-    }
-
-    @Benchmark
-    public int reflectionSpecializedPrimitive() throws InvocationTargetException, IllegalAccessException {
-        return reflectivePrimitive.getInt(this);
-    }
-
-    @Benchmark
-    public int reflectionAccessibleSpecializedPrimitive() throws InvocationTargetException, IllegalAccessException {
-        return reflectiveAccessiblePrimitive.getInt(this);
-    }
-
-    @Benchmark
-    public int handlePrimitive() throws Throwable {
-        return (int) methodHandlePrimitive.invoke(this);
-    }
-
-    @Benchmark
-    public int handleExactPrimitive() throws Throwable {
-        return (int) methodHandlePrimitive.invokeExact(this);
-    }
-
-    @Benchmark
-    public int handleUnreflectedPrimitive() throws Throwable {
-        return (int) methodHandleUnreflectedPrimitive.invoke(this);
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrimitive() throws Throwable {
-        return (int) methodHandleUnreflectedPrimitive.invokeExact(this);
-    }
-
-    @Benchmark
     public String privateNormal() {
         return Access.INSTANCE.value; // accessor method
     }
@@ -190,26 +130,6 @@ public class FieldBenchmark {
     @Benchmark
     public Object handleUnreflectedExactInline() throws Throwable {
         return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(this);
-    }
-
-    @Benchmark
-    public int handlePrimitiveInline() throws Throwable {
-        return (int) METHOD_HANDLE_PRIMITIVE_INLINE.invoke(this);
-    }
-
-    @Benchmark
-    public int handleExactPrimitiveInline() throws Throwable {
-        return (int) METHOD_HANDLE_PRIMITIVE_INLINE.invokeExact(this);
-    }
-
-    @Benchmark
-    public int handleUnreflectedPrimitiveInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIMITIVE.invoke(this);
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrimitiveInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIMITIVE.invokeExact(this);
     }
 
     @Benchmark

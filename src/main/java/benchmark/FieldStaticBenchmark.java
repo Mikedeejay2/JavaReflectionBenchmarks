@@ -13,48 +13,38 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class FieldStaticBenchmark {
 
-    private static String valueStatic = "foo";
-
-    private static int primitiveValueStatic = 42;
+    private static String value = "foo";
 
     enum Access {
 
         INSTANCE;
 
-        private static String valueStatic = "bar";
+        private static String value = "bar";
     }
 
     private Field
-        reflectiveStatic,
-        reflectiveAccessibleStatic,
-        reflectivePrimitiveStatic,
-        reflectiveAccessiblePrimitiveStatic,
-        reflectiveAccessiblePrivateStatic;
+        reflective,
+        reflectiveAccessible,
+        reflectiveAccessiblePrivate;
 
     private MethodHandle
-        methodHandleStatic,
-        methodHandleUnreflectedStatic,
-        methodHandlePrimitiveStatic,
-        methodHandleUnreflectedPrimitiveStatic,
-        methodHandleUnreflectedPrivateStatic;
+        methodHandle,
+        methodHandleUnreflected,
+        methodHandleUnreflectedPrivate;
 
     private static final MethodHandle
-        METHOD_HANDLE_INLINE_STATIC,
-        METHOD_HANDLE_UNREFLECTED_INLINE_STATIC,
-        METHOD_HANDLE_PRIMITIVE_INLINE_STATIC,
-        METHOD_HANDLE_UNREFLECTED_PRIMITIVE_STATIC,
-        METHOD_HANDLE_UNREFLECTED_PRIVATE_STATIC;
+        METHOD_HANDLE_INLINE,
+        METHOD_HANDLE_UNREFLECTED_INLINE,
+        METHOD_HANDLE_UNREFLECTED_PRIVATE;
 
     static {
         try {
 
-            METHOD_HANDLE_INLINE_STATIC = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "valueStatic", String.class);
-            METHOD_HANDLE_UNREFLECTED_INLINE_STATIC = MethodHandles.lookup().unreflectGetter(FieldStaticBenchmark.class.getDeclaredField("valueStatic"));
-            METHOD_HANDLE_PRIMITIVE_INLINE_STATIC = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "primitiveValueStatic", int.class);
-            METHOD_HANDLE_UNREFLECTED_PRIMITIVE_STATIC = MethodHandles.lookup().unreflectGetter(FieldStaticBenchmark.class.getDeclaredField("primitiveValueStatic"));
-            Field reflectiveAccessiblePrivateStatic = Access.class.getDeclaredField("valueStatic");
-            reflectiveAccessiblePrivateStatic.setAccessible(true);
-            METHOD_HANDLE_UNREFLECTED_PRIVATE_STATIC = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivateStatic);
+            METHOD_HANDLE_INLINE = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "value", String.class);
+            METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflectGetter(FieldStaticBenchmark.class.getDeclaredField("value"));
+            Field reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
+            reflectiveAccessiblePrivate.setAccessible(true);
+            METHOD_HANDLE_UNREFLECTED_PRIVATE = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
         } catch (Exception e) {
             throw new AssertionError();
         }
@@ -62,158 +52,88 @@ public class FieldStaticBenchmark {
 
     @Setup
     public void setup() throws Exception {
-        reflectiveStatic = FieldStaticBenchmark.class.getDeclaredField("valueStatic");
-        reflectiveAccessibleStatic = FieldStaticBenchmark.class.getDeclaredField("valueStatic");
-        reflectiveAccessibleStatic.setAccessible(true);
-        reflectivePrimitiveStatic = FieldStaticBenchmark.class.getDeclaredField("primitiveValueStatic");
-        reflectiveAccessiblePrimitiveStatic = FieldStaticBenchmark.class.getDeclaredField("primitiveValueStatic");
-        reflectiveAccessiblePrimitiveStatic.setAccessible(true);
-        methodHandleStatic = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "valueStatic", String.class);
-        methodHandleUnreflectedStatic = MethodHandles.lookup().unreflectGetter(reflectiveStatic);
-        methodHandlePrimitiveStatic = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "primitiveValueStatic", int.class);
-        methodHandleUnreflectedPrimitiveStatic = MethodHandles.lookup().unreflectGetter(reflectivePrimitiveStatic);
-        reflectiveAccessiblePrivateStatic = Access.class.getDeclaredField("valueStatic");
-        reflectiveAccessiblePrivateStatic.setAccessible(true);
-        methodHandleUnreflectedPrivateStatic = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivateStatic);
+        reflective = FieldStaticBenchmark.class.getDeclaredField("value");
+        reflectiveAccessible = FieldStaticBenchmark.class.getDeclaredField("value");
+        reflectiveAccessible.setAccessible(true);
+        methodHandle = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "value", String.class);
+        methodHandleUnreflected = MethodHandles.lookup().unreflectGetter(reflective);
+        reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
+        reflectiveAccessiblePrivate.setAccessible(true);
+        methodHandleUnreflectedPrivate = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
     }
 
     @Benchmark
-    public Object normalStatic() {
-        return valueStatic;
+    public Object normal() {
+        return value;
     }
 
     @Benchmark
-    public Object reflectionStatic() throws InvocationTargetException, IllegalAccessException {
-        return reflectiveStatic.get(null);
+    public Object reflection() throws InvocationTargetException, IllegalAccessException {
+        return reflective.get(null);
     }
 
     @Benchmark
-    public Object reflectionAccessibleStatic() throws InvocationTargetException, IllegalAccessException {
-        return reflectiveAccessibleStatic.get(null);
+    public Object reflectionAccessible() throws InvocationTargetException, IllegalAccessException {
+        return reflectiveAccessible.get(null);
     }
 
     @Benchmark
-    public Object handleStatic() throws Throwable {
-        return methodHandleStatic.invoke();
+    public Object handle() throws Throwable {
+        return methodHandle.invoke();
     }
 
     @Benchmark
-    public Object handleExactStatic() throws Throwable {
-        return (String) methodHandleStatic.invokeExact();
+    public Object handleExact() throws Throwable {
+        return (String) methodHandle.invokeExact();
     }
 
     @Benchmark
-    public Object handleUnreflectedStatic() throws Throwable {
-        return methodHandleUnreflectedStatic.invoke();
+    public Object handleUnreflected() throws Throwable {
+        return methodHandleUnreflected.invoke();
     }
 
     @Benchmark
-    public Object handleUnreflectedExactStatic() throws Throwable {
-        return (String) methodHandleUnreflectedStatic.invokeExact();
+    public Object handleUnreflectedExact() throws Throwable {
+        return (String) methodHandleUnreflected.invokeExact();
     }
 
     @Benchmark
-    public int primitiveStatic() {
-        return primitiveValueStatic;
+    public String privateNormal() {
+        return Access.value; // accessor method
     }
 
     @Benchmark
-    public int reflectionPrimitiveStatic() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflectivePrimitiveStatic.get(null);
+    public Object reflectionAccessiblePrivate() throws Exception {
+        return reflectiveAccessiblePrivate.get(null);
     }
 
     @Benchmark
-    public int reflectionAccessiblePrimitiveStatic() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflectiveAccessiblePrimitiveStatic.get(null);
+    public String handleUnreflectedPrivate() throws Throwable {
+        return (String) methodHandleUnreflectedPrivate.invokeExact();
     }
 
     @Benchmark
-    public int reflectionSpecializedPrimitiveStatic() throws InvocationTargetException, IllegalAccessException {
-        return reflectivePrimitiveStatic.getInt(null);
+    public Object handleInline() throws Throwable {
+        return METHOD_HANDLE_INLINE.invoke();
     }
 
     @Benchmark
-    public int reflectionAccessibleSpecializedPrimitiveStatic() throws InvocationTargetException, IllegalAccessException {
-        return reflectiveAccessiblePrimitiveStatic.getInt(null);
+    public Object handleExactInline() throws Throwable {
+        return (String) METHOD_HANDLE_INLINE.invokeExact();
     }
 
     @Benchmark
-    public int handlePrimitiveStatic() throws Throwable {
-        return (int) methodHandlePrimitiveStatic.invoke();
+    public Object handleUnreflectedInline() throws Throwable {
+        return METHOD_HANDLE_UNREFLECTED_INLINE.invoke();
     }
 
     @Benchmark
-    public int handleExactPrimitiveStatic() throws Throwable {
-        return (int) methodHandlePrimitiveStatic.invokeExact();
+    public Object handleUnreflectedExactInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact();
     }
 
     @Benchmark
-    public int handleUnreflectedPrimitiveStatic() throws Throwable {
-        return (int) methodHandleUnreflectedPrimitiveStatic.invoke();
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrimitiveStatic() throws Throwable {
-        return (int) methodHandleUnreflectedPrimitiveStatic.invokeExact();
-    }
-
-    @Benchmark
-    public String privateNormalStatic() {
-        return Access.valueStatic; // accessor method
-    }
-
-    @Benchmark
-    public Object reflectionAccessiblePrivateStatic() throws Exception {
-        return reflectiveAccessiblePrivateStatic.get(null);
-    }
-
-    @Benchmark
-    public String handleUnreflectedPrivateStatic() throws Throwable {
-        return (String) methodHandleUnreflectedPrivateStatic.invokeExact();
-    }
-
-    @Benchmark
-    public Object handleInlineStatic() throws Throwable {
-        return METHOD_HANDLE_INLINE_STATIC.invoke();
-    }
-
-    @Benchmark
-    public Object handleExactInlineStatic() throws Throwable {
-        return (String) METHOD_HANDLE_INLINE_STATIC.invokeExact();
-    }
-
-    @Benchmark
-    public Object handleUnreflectedInlineStatic() throws Throwable {
-        return METHOD_HANDLE_UNREFLECTED_INLINE_STATIC.invoke();
-    }
-
-    @Benchmark
-    public Object handleUnreflectedExactInlineStatic() throws Throwable {
-        return (String) METHOD_HANDLE_UNREFLECTED_INLINE_STATIC.invokeExact();
-    }
-
-    @Benchmark
-    public int handlePrimitiveInlineStatic() throws Throwable {
-        return (int) METHOD_HANDLE_PRIMITIVE_INLINE_STATIC.invoke();
-    }
-
-    @Benchmark
-    public int handleExactPrimitiveInlineStatic() throws Throwable {
-        return (int) METHOD_HANDLE_PRIMITIVE_INLINE_STATIC.invokeExact();
-    }
-
-    @Benchmark
-    public int handleUnreflectedPrimitiveInlineStatic() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIMITIVE_STATIC.invoke();
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrimitiveInlineStatic() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIMITIVE_STATIC.invokeExact();
-    }
-
-    @Benchmark
-    public String handleUnreflectedPrivateInlineStatic() throws Throwable {
-        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE_STATIC.invokeExact();
+    public String handleUnreflectedPrivateInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact();
     }
 }

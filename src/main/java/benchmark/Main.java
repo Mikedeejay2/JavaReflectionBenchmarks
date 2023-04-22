@@ -9,11 +9,15 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 public class Main {
     public static void main(String[] args) throws RunnerException {
-        run(FieldBenchmark.class);
-        run(FieldStaticBenchmark.class);
+//        run(FieldBenchmark.class);
+//        run(FieldStaticBenchmark.class);
+//        run(FieldPrimitiveBenchmark.class);
+//        run(FieldPrimitiveStaticBenchmark.class);
         run(InvocationBenchmark.class);
-        run(InvocationStaticBenchmark.class);
-        run(LookupBenchmark.class);
+//        run(InvocationStaticBenchmark.class);
+//        run(InvocationPrimitiveBenchmark.class);
+//        run(InvocationPrimitiveStaticBenchmark.class);
+//        run(LookupBenchmark.class);
     }
 
     private static void run(Class<?> clazz) throws RunnerException {

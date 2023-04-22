@@ -1,4 +1,0 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
-"benchmark.LookupBenchmark.handle","avgt",1,20,769.011202,49.895727,"ns/op"
-"benchmark.LookupBenchmark.handlePreLookedUp","avgt",1,20,730.827843,38.931920,"ns/op"
-"benchmark.LookupBenchmark.reflection","avgt",1,20,30.327808,2.967987,"ns/op"
