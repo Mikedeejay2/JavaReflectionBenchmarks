@@ -109,6 +109,11 @@ public class FieldPrimitiveBenchmark {
 
     @Benchmark
     public int handleUnreflectedPrivate() throws Throwable {
+        return (int) methodHandleUnreflectedPrivate.invoke((Access) Access.INSTANCE);
+    }
+
+    @Benchmark
+    public int handleUnreflectedExactPrivate() throws Throwable {
         return (int) methodHandleUnreflectedPrivate.invokeExact((Access) Access.INSTANCE);
     }
 
@@ -134,6 +139,11 @@ public class FieldPrimitiveBenchmark {
 
     @Benchmark
     public int handleUnreflectedPrivateInline() throws Throwable {
+        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invoke((Access) Access.INSTANCE);
+    }
+
+    @Benchmark
+    public int handleUnreflectedPrivateExactInline() throws Throwable {
         return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact((Access) Access.INSTANCE);
     }
 }

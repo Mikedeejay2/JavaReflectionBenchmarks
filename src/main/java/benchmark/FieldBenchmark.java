@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class FieldBenchmark {
 
-    private String value = "foo";
+    public String value = "foo";
 
     enum Access {
 

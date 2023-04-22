@@ -189,8 +189,18 @@ public class InvocationBenchmark {
     }
 
     @Benchmark
+    public Object handleUnreflectedInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invoke(this, s1, s2, s3, s4);
+    }
+
+    @Benchmark
     public Object handleUnreflectedExactInline() throws Throwable {
         return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(this, s1, s2, s3, s4);
+    }
+
+    @Benchmark
+    public Object handleUnreflectedPrivateInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invoke(Access.INSTANCE, s1, s2, s3, s4);
     }
 
     @Benchmark

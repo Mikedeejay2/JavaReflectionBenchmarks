@@ -169,6 +169,11 @@ public class InvocationPrimitiveBenchmark {
     }
 
     @Benchmark
+    public int handleUnreflectedPrivate() throws Throwable {
+        return (int) methodHandleUnreflectedPrivate.invoke(Access.INSTANCE, i1, i2, i3, i4);
+    }
+
+    @Benchmark
     public int lambdaUnreflectedPrivate() throws Throwable {
         return lambdaUnreflectedPrivate.run(Access.INSTANCE, i1, i2, i3, i4);
     }
@@ -184,8 +189,18 @@ public class InvocationPrimitiveBenchmark {
     }
 
     @Benchmark
+    public int handleUnreflectedInline() throws Throwable {
+        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invoke(this, i1, i2, i3, i4);
+    }
+
+    @Benchmark
     public int handleUnreflectedExactInline() throws Throwable {
         return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(this, i1, i2, i3, i4);
+    }
+
+    @Benchmark
+    public int handleUnreflectedPrivateInline() throws Throwable {
+        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invoke(Access.INSTANCE, i1, i2, i3, i4);
     }
 
     @Benchmark

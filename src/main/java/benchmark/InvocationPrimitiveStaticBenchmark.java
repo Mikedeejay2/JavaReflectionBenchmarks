@@ -127,13 +127,13 @@ public class InvocationPrimitiveStaticBenchmark {
     }
 
     @Benchmark
-    public int handleUnreflected() throws Throwable {
-        return (int) methodHandleUnreflected.invoke(i1, i2, i3, i4);
+    public int handleExact() throws Throwable {
+        return (int) methodHandle.invokeExact(i1, i2, i3, i4);
     }
 
     @Benchmark
-    public int handleExact() throws Throwable {
-        return (int) methodHandle.invokeExact(i1, i2, i3, i4);
+    public int handleUnreflected() throws Throwable {
+        return (int) methodHandleUnreflected.invoke(i1, i2, i3, i4);
     }
 
     @Benchmark
@@ -182,8 +182,18 @@ public class InvocationPrimitiveStaticBenchmark {
     }
 
     @Benchmark
+    public int handleUnreflectedInline() throws Throwable {
+        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invoke(i1, i2, i3, i4);
+    }
+
+    @Benchmark
     public int handleUnreflectedExactInline() throws Throwable {
         return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(i1, i2, i3, i4);
+    }
+
+    @Benchmark
+    public int handleUnreflectedPrivateInline() throws Throwable {
+        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invoke(i1, i2, i3, i4);
     }
 
     @Benchmark

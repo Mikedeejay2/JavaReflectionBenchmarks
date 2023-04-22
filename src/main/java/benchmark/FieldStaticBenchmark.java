@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class FieldStaticBenchmark {
 
-    private static String value = "foo";
+    public static String value = "foo";
 
     enum Access {
 
@@ -134,6 +134,11 @@ public class FieldStaticBenchmark {
 
     @Benchmark
     public String handleUnreflectedPrivateInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE.invoke();
+    }
+
+    @Benchmark
+    public String handleUnreflectedPrivateExactInline() throws Throwable {
         return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact();
     }
 }

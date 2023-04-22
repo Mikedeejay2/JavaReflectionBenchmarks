@@ -162,6 +162,11 @@ public class InvocationStaticBenchmark {
     }
 
     @Benchmark
+    public Object handleUnreflectedPrivate() throws Throwable {
+        return (String) methodHandleUnreflectedPrivate.invoke(s1, s2, s3, s4);
+    }
+
+    @Benchmark
     public Object handleUnreflectedExactPrivate() throws Throwable {
         return (String) methodHandleUnreflectedPrivate.invokeExact(s1, s2, s3, s4);
     }
@@ -182,8 +187,18 @@ public class InvocationStaticBenchmark {
     }
 
     @Benchmark
+    public Object handleUnreflectedInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invoke(s1, s2, s3, s4);
+    }
+
+    @Benchmark
     public Object handleUnreflectedExactInline() throws Throwable {
         return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(s1, s2, s3, s4);
+    }
+
+    @Benchmark
+    public Object handleUnreflectedPrivateInline() throws Throwable {
+        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invoke(s1, s2, s3, s4);
     }
 
     @Benchmark
