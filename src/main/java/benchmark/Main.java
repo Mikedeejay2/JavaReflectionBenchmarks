@@ -1,5 +1,7 @@
 package benchmark;
 
+import benchmark.field.*;
+import benchmark.invocation.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -9,11 +11,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 public class Main {
     public static void main(String[] args) throws RunnerException {
-        run(FieldBenchmark.class);
+//        run(FieldBenchmark.class);
 //        run(FieldStaticBenchmark.class);
 //        run(FieldPrimitiveBenchmark.class);
 //        run(FieldPrimitiveStaticBenchmark.class);
-//        run(InvocationBenchmark.class);
+        run(InvocationBenchmark.class);
 //        run(InvocationStaticBenchmark.class);
 //        run(InvocationPrimitiveBenchmark.class);
 //        run(InvocationPrimitiveStaticBenchmark.class);
@@ -22,7 +24,7 @@ public class Main {
 
     private static void run(Class<?> clazz) throws RunnerException {
         Options opt = new OptionsBuilder()
-            .include(clazz.getSimpleName())
+            .include(clazz.getName())
             .forks(1)
             .measurementIterations(20)
             .warmupIterations(5)

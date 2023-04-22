@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.field;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -11,15 +11,15 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class FieldPrimitiveStaticBenchmark {
+public class FieldPrimitiveBenchmark {
 
-    public static int value = 42;
+    public int value = 42;
 
     enum Access {
 
         INSTANCE;
 
-        private static int value = 42;
+        public int value = 42;
     }
 
     private Field
@@ -40,8 +40,8 @@ public class FieldPrimitiveStaticBenchmark {
     static {
         try {
 
-            METHOD_HANDLE_INLINE = MethodHandles.lookup().findStaticGetter(FieldPrimitiveStaticBenchmark.class, "value", int.class);
-            METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflectGetter(FieldPrimitiveStaticBenchmark.class.getDeclaredField("value"));
+            METHOD_HANDLE_INLINE = MethodHandles.lookup().findGetter(FieldPrimitiveBenchmark.class, "value", int.class);
+            METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflectGetter(FieldPrimitiveBenchmark.class.getDeclaredField("value"));
             Field reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
             reflectiveAccessiblePrivate.setAccessible(true);
             METHOD_HANDLE_UNREFLECTED_PRIVATE = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
@@ -52,10 +52,10 @@ public class FieldPrimitiveStaticBenchmark {
 
     @Setup
     public void setup() throws Exception {
-        reflective = FieldPrimitiveStaticBenchmark.class.getDeclaredField("value");
-        reflectiveAccessible = FieldPrimitiveStaticBenchmark.class.getDeclaredField("value");
+        reflective = FieldPrimitiveBenchmark.class.getDeclaredField("value");
+        reflectiveAccessible = FieldPrimitiveBenchmark.class.getDeclaredField("value");
         reflectiveAccessible.setAccessible(true);
-        methodHandle = MethodHandles.lookup().findStaticGetter(FieldPrimitiveStaticBenchmark.class, "value", int.class);
+        methodHandle = MethodHandles.lookup().findGetter(FieldPrimitiveBenchmark.class, "value", int.class);
         methodHandleUnreflected = MethodHandles.lookup().unreflectGetter(reflective);
         reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
         reflectiveAccessiblePrivate.setAccessible(true);
@@ -69,81 +69,81 @@ public class FieldPrimitiveStaticBenchmark {
 
     @Benchmark
     public int reflection() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflective.get(null);
+        return (int) reflective.get(this);
     }
 
     @Benchmark
     public int reflectionAccessible() throws InvocationTargetException, IllegalAccessException {
-        return (int) reflectiveAccessible.get(null);
+        return (int) reflectiveAccessible.get(this);
     }
 
     @Benchmark
     public int handle() throws Throwable {
-        return (int) methodHandle.invoke();
+        return (int) methodHandle.invoke(this);
     }
 
     @Benchmark
     public int handleExact() throws Throwable {
-        return (int) methodHandle.invokeExact();
+        return (int) methodHandle.invokeExact(this);
     }
 
     @Benchmark
     public int handleUnreflected() throws Throwable {
-        return (int) methodHandleUnreflected.invoke();
+        return (int) methodHandleUnreflected.invoke(this);
     }
 
     @Benchmark
     public int handleUnreflectedExact() throws Throwable {
-        return (int) methodHandleUnreflected.invokeExact();
+        return (int) methodHandleUnreflected.invokeExact(this);
     }
 
     @Benchmark
     public int privateNormal() {
-        return Access.value; // accessor method
+        return Access.INSTANCE.value; // accessor method
     }
 
     @Benchmark
     public int reflectionAccessiblePrivate() throws Exception {
-        return (int) reflectiveAccessiblePrivate.get(null);
+        return (int) reflectiveAccessiblePrivate.get(Access.INSTANCE);
     }
 
     @Benchmark
     public int handleUnreflectedPrivate() throws Throwable {
-        return (int) methodHandleUnreflectedPrivate.invoke();
+        return (int) methodHandleUnreflectedPrivate.invoke((Access) Access.INSTANCE);
     }
 
     @Benchmark
     public int handleUnreflectedExactPrivate() throws Throwable {
-        return (int) methodHandleUnreflectedPrivate.invokeExact();
+        return (int) methodHandleUnreflectedPrivate.invokeExact((Access) Access.INSTANCE);
     }
 
     @Benchmark
     public int handleInline() throws Throwable {
-        return (int) METHOD_HANDLE_INLINE.invoke();
+        return (int) METHOD_HANDLE_INLINE.invoke(this);
     }
 
     @Benchmark
     public int handleExactInline() throws Throwable {
-        return (int) METHOD_HANDLE_INLINE.invokeExact();
+        return (int) METHOD_HANDLE_INLINE.invokeExact(this);
     }
 
     @Benchmark
     public int handleUnreflectedInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invoke();
+        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invoke(this);
     }
 
     @Benchmark
     public int handleUnreflectedExactInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact();
+        return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(this);
     }
 
     @Benchmark
     public int handleUnreflectedPrivateInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invoke();
+        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invoke((Access) Access.INSTANCE);
     }
 
     @Benchmark
     public int handleUnreflectedPrivateExactInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact();
+        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact((Access) Access.INSTANCE);
     }
 }

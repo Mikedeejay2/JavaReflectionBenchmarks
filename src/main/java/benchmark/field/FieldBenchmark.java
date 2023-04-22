@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.field;
 
 import org.openjdk.jmh.annotations.*;
 

@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.invocation;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -44,9 +44,6 @@ public class InvocationPrimitiveBenchmark {
     private CustomFunction<InvocationPrimitiveBenchmark>
         lambda,
         lambdaUnreflected;
-
-    private CustomFunction<Access>
-        lambdaUnreflectedPrivate;
 
     private static final MethodHandle
         METHOD_HANDLE_INLINE,
@@ -97,15 +94,6 @@ public class InvocationPrimitiveBenchmark {
             methodHandleUnreflected,
             MethodType.methodType(int.class, InvocationPrimitiveBenchmark.class, int.class, int.class, int.class, int.class));
         lambdaUnreflected = (CustomFunction<InvocationPrimitiveBenchmark>) lambdaUnreflectedSite.getTarget().invokeExact();
-
-        CallSite lambdaUnreflectedPrivateSite = LambdaMetafactory.metafactory(
-            MethodHandles.lookup(),
-            "run",
-            MethodType.methodType(CustomFunction.class),
-            MethodType.methodType(int.class, Object.class, int.class, int.class, int.class, int.class),
-            methodHandleUnreflected,
-            MethodType.methodType(int.class, Access.class, int.class, int.class, int.class, int.class));
-        lambdaUnreflectedPrivate = (CustomFunction<Access>) lambdaUnreflectedPrivateSite.getTarget().invokeExact();
     }
 
     @Benchmark
@@ -171,11 +159,6 @@ public class InvocationPrimitiveBenchmark {
     @Benchmark
     public int handleUnreflectedPrivate() throws Throwable {
         return (int) methodHandleUnreflectedPrivate.invoke(Access.INSTANCE, i1, i2, i3, i4);
-    }
-
-    @Benchmark
-    public int lambdaUnreflectedPrivate() throws Throwable {
-        return lambdaUnreflectedPrivate.run(Access.INSTANCE, i1, i2, i3, i4);
     }
 
     @Benchmark
