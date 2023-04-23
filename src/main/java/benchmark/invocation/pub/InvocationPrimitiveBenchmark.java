@@ -1,4 +1,4 @@
-package benchmark.invocation;
+package benchmark.invocation.pub;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -17,15 +17,6 @@ public class InvocationPrimitiveBenchmark {
         return a + b + c + d;
     }
 
-    enum Access {
-
-        INSTANCE;
-
-        private int method(int a, int b, int c, int d) {
-            return a + b + c + d;
-        }
-    }
-
     @FunctionalInterface
     interface CustomFunction<E> {
         int run(E target, int a, int b, int c, int d);
@@ -33,13 +24,11 @@ public class InvocationPrimitiveBenchmark {
 
     private Method
         method,
-        methodAccessible,
-        methodAccessiblePrivate;
+        methodAccessible;
 
     private MethodHandle
         methodHandle,
-        methodHandleUnreflected,
-        methodHandleUnreflectedPrivate;
+        methodHandleUnreflected;
 
     private CustomFunction<InvocationPrimitiveBenchmark>
         lambda,
@@ -47,8 +36,7 @@ public class InvocationPrimitiveBenchmark {
 
     private static final MethodHandle
         METHOD_HANDLE_INLINE,
-        METHOD_HANDLE_UNREFLECTED_INLINE,
-        METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE;
+        METHOD_HANDLE_UNREFLECTED_INLINE;
 
     static {
         try {
@@ -57,25 +45,19 @@ public class InvocationPrimitiveBenchmark {
             METHOD_HANDLE_INLINE = MethodHandles.lookup().findVirtual(InvocationPrimitiveBenchmark.class, "method",
                                                                       MethodType.methodType(int.class, int.class, int.class, int.class, int.class));
             METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflect(methodAccessible);
-            Method methodAccessiblePrivate = Access.class.getDeclaredMethod("method", int.class, int.class, int.class, int.class);
-            methodAccessiblePrivate.setAccessible(true);
-            METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE = MethodHandles.lookup().unreflect(methodAccessiblePrivate);
         } catch (Exception e) {
             throw new AssertionError();
         }
     }
 
     @Setup
-    public void setUp() throws Throwable {
+    public void setup() throws Throwable {
         method = InvocationPrimitiveBenchmark.class.getDeclaredMethod("method", int.class, int.class, int.class, int.class);
         methodAccessible = InvocationPrimitiveBenchmark.class.getDeclaredMethod("method", int.class, int.class, int.class, int.class);
         methodAccessible.setAccessible(true);
         methodHandle = MethodHandles.lookup().findVirtual(InvocationPrimitiveBenchmark.class, "method",
                                                           MethodType.methodType(int.class, int.class, int.class, int.class, int.class));
         methodHandleUnreflected = MethodHandles.lookup().unreflect(methodAccessible);
-        methodAccessiblePrivate = Access.class.getDeclaredMethod("method", int.class, int.class, int.class, int.class);
-        methodAccessiblePrivate.setAccessible(true);
-        methodHandleUnreflectedPrivate = MethodHandles.lookup().unreflect(methodAccessiblePrivate);
 
         CallSite lambdaSite = LambdaMetafactory.metafactory(
             MethodHandles.lookup(),
@@ -142,26 +124,6 @@ public class InvocationPrimitiveBenchmark {
     }
 
     @Benchmark
-    public int privateNormal() throws Exception {
-        return Access.INSTANCE.method(i1, i2, i3, i4); // accessor method indirection
-    }
-
-    @Benchmark
-    public int reflectionAccessiblePrivate() throws Exception {
-        return (int) methodAccessiblePrivate.invoke(Access.INSTANCE, i1, i2, i3, i4);
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrivate() throws Throwable {
-        return (int) methodHandleUnreflectedPrivate.invokeExact(Access.INSTANCE, i1, i2, i3, i4);
-    }
-
-    @Benchmark
-    public int handleUnreflectedPrivate() throws Throwable {
-        return (int) methodHandleUnreflectedPrivate.invoke(Access.INSTANCE, i1, i2, i3, i4);
-    }
-
-    @Benchmark
     public int handleInline() throws Throwable {
         return (int) METHOD_HANDLE_INLINE.invoke(this, i1, i2, i3, i4);
     }
@@ -179,15 +141,5 @@ public class InvocationPrimitiveBenchmark {
     @Benchmark
     public int handleUnreflectedExactInline() throws Throwable {
         return (int) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact(this, i1, i2, i3, i4);
-    }
-
-    @Benchmark
-    public int handleUnreflectedPrivateInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invoke(Access.INSTANCE, i1, i2, i3, i4);
-    }
-
-    @Benchmark
-    public int handleUnreflectedExactPrivateInline() throws Throwable {
-        return (int) METHOD_HANDLE_UNREFLECTED_PRIVATE_INLINE.invokeExact(Access.INSTANCE, i1, i2, i3, i4);
     }
 }

@@ -1,4 +1,4 @@
-package benchmark.field;
+package benchmark.field.pub;
 
 import org.openjdk.jmh.annotations.*;
 
@@ -15,36 +15,23 @@ public class FieldStaticBenchmark {
 
     public static String value = "foo";
 
-    enum Access {
-
-        INSTANCE;
-
-        private static String value = "bar";
-    }
-
     private Field
         reflective,
-        reflectiveAccessible,
-        reflectiveAccessiblePrivate;
+        reflectiveAccessible;
 
     private MethodHandle
         methodHandle,
-        methodHandleUnreflected,
-        methodHandleUnreflectedPrivate;
+        methodHandleUnreflected;
 
     private static final MethodHandle
         METHOD_HANDLE_INLINE,
-        METHOD_HANDLE_UNREFLECTED_INLINE,
-        METHOD_HANDLE_UNREFLECTED_PRIVATE;
+        METHOD_HANDLE_UNREFLECTED_INLINE;
 
     static {
         try {
 
             METHOD_HANDLE_INLINE = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "value", String.class);
             METHOD_HANDLE_UNREFLECTED_INLINE = MethodHandles.lookup().unreflectGetter(FieldStaticBenchmark.class.getDeclaredField("value"));
-            Field reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
-            reflectiveAccessiblePrivate.setAccessible(true);
-            METHOD_HANDLE_UNREFLECTED_PRIVATE = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
         } catch (Exception e) {
             throw new AssertionError();
         }
@@ -57,9 +44,6 @@ public class FieldStaticBenchmark {
         reflectiveAccessible.setAccessible(true);
         methodHandle = MethodHandles.lookup().findStaticGetter(FieldStaticBenchmark.class, "value", String.class);
         methodHandleUnreflected = MethodHandles.lookup().unreflectGetter(reflective);
-        reflectiveAccessiblePrivate = Access.class.getDeclaredField("value");
-        reflectiveAccessiblePrivate.setAccessible(true);
-        methodHandleUnreflectedPrivate = MethodHandles.lookup().unreflectGetter(reflectiveAccessiblePrivate);
     }
 
     @Benchmark
@@ -98,21 +82,6 @@ public class FieldStaticBenchmark {
     }
 
     @Benchmark
-    public String privateNormal() {
-        return Access.value; // accessor method
-    }
-
-    @Benchmark
-    public Object reflectionAccessiblePrivate() throws Exception {
-        return reflectiveAccessiblePrivate.get(null);
-    }
-
-    @Benchmark
-    public String handleUnreflectedPrivate() throws Throwable {
-        return (String) methodHandleUnreflectedPrivate.invokeExact();
-    }
-
-    @Benchmark
     public Object handleInline() throws Throwable {
         return METHOD_HANDLE_INLINE.invoke();
     }
@@ -130,15 +99,5 @@ public class FieldStaticBenchmark {
     @Benchmark
     public Object handleUnreflectedExactInline() throws Throwable {
         return (String) METHOD_HANDLE_UNREFLECTED_INLINE.invokeExact();
-    }
-
-    @Benchmark
-    public String handleUnreflectedPrivateInline() throws Throwable {
-        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE.invoke();
-    }
-
-    @Benchmark
-    public String handleUnreflectedPrivateExactInline() throws Throwable {
-        return (String) METHOD_HANDLE_UNREFLECTED_PRIVATE.invokeExact();
     }
 }

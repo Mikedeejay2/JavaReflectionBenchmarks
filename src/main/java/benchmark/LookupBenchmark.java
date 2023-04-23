@@ -26,7 +26,7 @@ public class LookupBenchmark {
     }
 
     @Setup
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         lookup = MethodHandles.lookup();
         methodType = MethodType.methodType(void.class);
     }
