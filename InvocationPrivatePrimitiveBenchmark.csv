@@ -1,0 +1,7 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.handleUnreflected","avgt",1,20,3.997983,0.019879,"ns/op"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.handleUnreflectedExact","avgt",1,20,3.791121,0.132652,"ns/op"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.handleUnreflectedExactInline","avgt",1,20,0.832949,0.017283,"ns/op"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.handleUnreflectedInline","avgt",1,20,0.828219,0.002515,"ns/op"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.normal","avgt",1,20,0.828407,0.001963,"ns/op"
+"benchmark.invocation.priv.InvocationPrivatePrimitiveBenchmark.reflectionAccessible","avgt",1,20,16.129015,4.105723,"ns/op"

@@ -1,0 +1,7 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.handleUnreflected","avgt",1,20,3.375669,0.008135,"ns/op"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.handleUnreflectedExact","avgt",1,20,2.949889,0.019600,"ns/op"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.handleUnreflectedExactInline","avgt",1,20,0.473894,0.002971,"ns/op"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.handleUnreflectedInline","avgt",1,20,3.062910,0.250555,"ns/op"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.normal","avgt",1,20,0.473197,0.000740,"ns/op"
+"benchmark.field.priv.FieldPrivateStaticBenchmark.reflectionAccessible","avgt",1,20,1.787343,0.005375,"ns/op"
